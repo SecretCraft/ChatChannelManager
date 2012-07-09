@@ -264,7 +264,6 @@ public class ChatListener implements Listener {
 	protected List<Player> getLocalRecipients(Player sender, double range) {
 		Location playerLocation = sender.getLocation();
 		List<Player> recipients = new LinkedList<Player>();
-		recipients.add(sender);
 		double squaredDistance = Math.pow(range, 2);
 		PermissionManager manager = PermissionsEx.getPermissionManager();
 		for (Player recipient : Bukkit.getServer().getOnlinePlayers()) {
