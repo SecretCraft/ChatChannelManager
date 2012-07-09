@@ -55,9 +55,9 @@ public class ChatListener implements Listener {
 	protected static Pattern chatResetPattern = Pattern.compile("(?i)&([R])");
 	
 	public final static String MESSAGE_FORMAT = "<%prefix%player%suffix> %message";
-	public final static String GLOBAL_MESSAGE_FORMAT = "<%prefix%player%suffix> &e%message";
-	public final static String TEAM_MESSAGE_FORMAT = "<%prefix%player%suffix> &c%message";
-	public final static String TRADE_MESSAGE_FORMAT = "<%prefix%player%suffix> &9%message";
+	public final static String GLOBAL_MESSAGE_FORMAT = "<%prefix%player%suffix> %message";
+	public final static String TEAM_MESSAGE_FORMAT = "<%prefix%player%suffix> %message";
+	public final static String TRADE_MESSAGE_FORMAT = "<%prefix%player%suffix> %message";
 	public final static Boolean RANGED_MODE = false;
 	public final static double CHAT_RANGE = 100d;
 	protected String messageFormat = MESSAGE_FORMAT;
