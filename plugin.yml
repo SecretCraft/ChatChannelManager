@@ -1,12 +1,12 @@
-name: ChatManager
-main: ru.tehkode.chatmanager.bukkit.ChatManager
+name: ChatChannel
+main: com.github.sirkarpfen.chatchannel.ChatChannelManager
 depend: [ PermissionsEx ]
 version: 1.19.1
-author: t3hk0d3
-website: www.bukkit.org
-description: Chat management plugin for PermissionsEx
+authors: [t3hk0d3, sirkarpfen]
+website: www.secretcraft.de
+description: Chat Management plugin for PermissionsEx
 commands:
   channel:
-    description: Wechselt den "Channel" mit /channel <Channel> und listet alle Spieler im Channel auf mit: /channel list
+    description: Wechselt den Channel mit /channel <Channel> und listet alle Spieler im Channel auf mit /channel list
     permission-message: You do not have the Permission to use this Command.
-    usage: "Usage: /channel <Channel-Name>"
+    usage: "Usage: /channel <channel-name>"
