@@ -9,7 +9,4 @@ commands:
   channel:
     description: Wechselt den "Channel" mit /channel <Channel> und listet alle Spieler im Channel auf mit: /channel list
     permission-message: You do not have the Permission to use this Command.
-    usage: Beispiele:
-           /channel global für den Channel: Global
-           /channel lokal für den Channel: Lokal
-           /channel handel für den Channel: Handel
+    usage: "Usage: /channel <Channel-Name>"
