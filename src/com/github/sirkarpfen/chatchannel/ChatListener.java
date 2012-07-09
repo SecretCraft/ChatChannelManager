@@ -237,7 +237,7 @@ public class ChatListener implements Listener {
 			player.sendMessage(gray+"Channel: "+blue+"Trade"+gray+","+white+" "+playerTradeList.size()+" "+gray+"Spieler online");
 		}
 		if(ChatChannelManager.switchLocal) {
-			player.sendMessage(gray+"Channel: "+blue+"Lokal"+gray+","+white+" "+getLocalRecipients(player, range)+" "+gray+"Spieler im Umkreis");
+			player.sendMessage(gray+"Channel: "+blue+"Lokal"+gray+","+white+" "+getLocalRecipients(player, range).size()+" "+gray+"Spieler im Umkreis");
 		}
 	}
 
