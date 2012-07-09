@@ -66,6 +66,7 @@ public class ChatListener implements Listener {
 	protected String tradeMessageFormat = TRADE_MESSAGE_FORMAT;
 	protected boolean rangedMode = RANGED_MODE;
 	protected double chatRange = CHAT_RANGE;
+	protected double range;
 	protected String displayNameFormat = "%prefix%player%suffix";
 	protected String optionChatRange = "chat-range";
 	protected String optionMessageFormat = "message-format";
@@ -115,7 +116,7 @@ public class ChatListener implements Listener {
 		String chatMessage = event.getMessage();
 		if (ChatChannelManager.switchGlobal && user.has("chatmanager.chat.global", worldName)) {
 			localChat = false;
-
+			
 			message = user.getOption(this.optionGlobalMessageFormat, worldName, globalMessageFormat);
 		}
 		
@@ -149,7 +150,7 @@ public class ChatListener implements Listener {
 		event.setMessage(chatMessage);
 
 		if (localChat && ChatChannelManager.switchLocal) {
-			double range = user.getOptionDouble(this.optionChatRange, worldName, chatRange);
+			range = user.getOptionDouble(this.optionChatRange, worldName, chatRange);
 
 			event.getRecipients().clear();
 			playerLocalList = this.getLocalRecipients(player, message, range);
@@ -236,13 +237,34 @@ public class ChatListener implements Listener {
 			player.sendMessage(gray+"Channel: "+blue+"Trade"+gray+","+white+" "+playerTradeList.size()+" "+gray+"Spieler online");
 		}
 		if(ChatChannelManager.switchLocal) {
-			player.sendMessage(gray+"Channel: "+blue+"Lokal"+gray+","+white+" "+playerLocalList.size()+" "+gray+"Spieler im Umkreis");
+			player.sendMessage(gray+"Channel: "+blue+"Lokal"+gray+","+white+" "+getLocalRecipients(player, range)+" "+gray+"Spieler im Umkreis");
 		}
 	}
 
 	protected List<Player> getLocalRecipients(Player sender, String message, double range) {
 		Location playerLocation = sender.getLocation();
 		List<Player> recipients = new LinkedList<Player>();
+		double squaredDistance = Math.pow(range, 2);
+		PermissionManager manager = PermissionsEx.getPermissionManager();
+		for (Player recipient : Bukkit.getServer().getOnlinePlayers()) {
+			// Recipient are not from same world
+			if (!recipient.getWorld().equals(sender.getWorld())) {
+				continue;
+			}
+
+			if (playerLocation.distanceSquared(recipient.getLocation()) > squaredDistance && !manager.has(sender, "chatmanager.override.ranged")) {
+				continue;
+			}
+
+			recipients.add(recipient);
+		}
+		return recipients;
+	}
+	
+	protected List<Player> getLocalRecipients(Player sender, double range) {
+		Location playerLocation = sender.getLocation();
+		List<Player> recipients = new LinkedList<Player>();
+		recipients.add(sender);
 		double squaredDistance = Math.pow(range, 2);
 		PermissionManager manager = PermissionsEx.getPermissionManager();
 		for (Player recipient : Bukkit.getServer().getOnlinePlayers()) {
