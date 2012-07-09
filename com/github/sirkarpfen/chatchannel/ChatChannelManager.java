@@ -70,79 +70,67 @@ public class ChatChannelManager extends JavaPlugin {
     	if(sender instanceof Player) {
     		Player player = (Player)sender;
     		String cmdName = command.getName().toLowerCase();
-    			
-    		if(cmdName.equals("global")) {
-    			if(args.length != 0) {
-    				player.sendMessage(ChatColor.GRAY+"Die korrekte Schreibweise ist: "+ChatColor.WHITE+"/global");
-    				return false;
-    			}
-    				
-    			switchGlobal = true;
-    			switchLocal = false;
-    			switchTeam = false;
-    			switchTrade = false;
-    			listener.addRecipient(player);
-    			player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
-    			return true;
-    				
-    		}
-    		
-    		if(cmdName.equals("lokal")){
-    			if(args.length != 0) {
-    				player.sendMessage(ChatColor.GRAY+"Die korrekte Schreibweise ist: "+ChatColor.WHITE+"/lokal");
-    				return false;
-    			}
-    				
-    			switchGlobal = false;
-    			switchLocal = true;
-    			switchTeam = false;
-    			switchTrade = false;
-    			listener.addRecipient(player);
-    			player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
-    			return true;
-    				
-    		}
-    			
-    		if(cmdName.equals("team")){
-    			if(args.length != 0) {
-    				player.sendMessage(ChatColor.GRAY+"Die korrekte Schreibweise ist: "+ChatColor.WHITE+"/team");
-    				return false;
-    			}
-    				
-    			switchGlobal = false;
-    			switchLocal = false;
-    			switchTeam = true;
-    			switchTrade = false;
-    			listener.addRecipient(player);
-    			player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
-    				return true;
-    				
-    		}
-    			
-    		if(cmdName.equals("handel")){
-    			if(args.length != 0) {
-    				player.sendMessage(ChatColor.GRAY+"Die korrekte Schreibweise ist: "+ChatColor.WHITE+"/handel");
-    				return false;
-    			}
-    				
-    			switchGlobal = false;
-    			switchLocal = false;
-    			switchTeam = false;
-    			switchTrade = true;
-    			listener.addRecipient(player);
-    			player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
-    			return true;
-    				
-    		}
     		
     		if(cmdName.equals("channel")) {
+    			
+    			if(args.length != 1) {
+    				player.sendMessage(ChatColor.GRAY+"Die korrekte Schreibweise ist: "+ChatColor.WHITE+"/channel <Argumente>");
+    				return false;
+    			}
+    			
+    			if(args[0].equalsIgnoreCase("global")) {
+    				
+    				switchGlobal = true;
+    				switchLocal = false;
+    				switchTeam = false;
+    				switchTrade = false;
+    				listener.addRecipient(player);
+    				player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
+    				return true;
+    				
+    			}
+    		
+    			if(args[0].equalsIgnoreCase("lokal")){
+    				
+    				switchGlobal = false;
+    				switchLocal = true;
+    				switchTeam = false;
+    				switchTrade = false;
+    				listener.addRecipient(player);
+    				player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
+    				return true;
+    				
+    			}
+    			
+    			if(args[0].equalsIgnoreCase("team")){
+    				
+    				switchGlobal = false;
+    				switchLocal = false;
+    				switchTeam = true;
+    				switchTrade = false;
+    				listener.addRecipient(player);
+    				player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
+    				return true;
+    				
+    			}
+    			
+    			if(args[0].equalsIgnoreCase("handel")){
+    				
+    				switchGlobal = false;
+    				switchLocal = false;
+    				switchTeam = false;
+    				switchTrade = true;
+    				listener.addRecipient(player);
+    				player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
+    				return true;
+    				
+    			}
+    		
     			if(args[0].equalsIgnoreCase("list")) {
-    				if(args.length != 1) {
-        				player.sendMessage(ChatColor.GRAY+"Die korrekte Schreibweise ist: "+ChatColor.WHITE+"/channel list");
-        				return false;
-        			}
+    				
     				listener.showRecipients(player);
         			return true;
+        			
     			}
     			player.sendMessage(ChatColor.GRAY+"Die korrekte Schreibweise ist: "+ChatColor.WHITE+"/channel list");
     			return false;
