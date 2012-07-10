@@ -106,9 +106,9 @@ public class ChatListener implements Listener {
 		}
 
 		Player player = event.getPlayer();
-
+		
 		String worldName = player.getWorld().getName();
-
+		
 		PermissionUser user = PermissionsEx.getPermissionManager().getUser(player);
 		if (user == null) {
 			return;
@@ -131,8 +131,6 @@ public class ChatListener implements Listener {
 			
 			event.getRecipients().clear();
 			event.getRecipients().addAll(playerTeamList);
-		} else {
-			player.sendMessage(ChatColor.RED + "You don't have the Permission to do that!");
 		}
 		
 		if (ChatChannelManager.switchTrade) {

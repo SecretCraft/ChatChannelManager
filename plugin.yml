@@ -8,5 +8,3 @@ description: Chat Management plugin for PermissionsEx
 commands:
   channel:
     description: Wechselt den Channel mit /channel <Channel> und listet alle Spieler im Channel auf mit /channel list
-    permission-message: You do not have the Permission to use this Command.
-    usage: "Usage: /channel <channel-name>"

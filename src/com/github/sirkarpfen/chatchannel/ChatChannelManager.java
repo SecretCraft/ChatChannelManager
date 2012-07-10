@@ -8,6 +8,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 /** Credits to t3hk0d3 for providing the basic ChatManager :)
@@ -70,6 +72,8 @@ public class ChatChannelManager extends JavaPlugin {
     	if(sender instanceof Player) {
     		Player player = (Player)sender;
     		String cmdName = command.getName().toLowerCase();
+    		PermissionUser user = PermissionsEx.getPermissionManager().getUser(player);
+    		String worldName = player.getWorld().getName();
     		
     		if(cmdName.equals("channel")) {
     			
@@ -85,7 +89,7 @@ public class ChatChannelManager extends JavaPlugin {
     				switchTeam = false;
     				switchTrade = false;
     				listener.addRecipient(player);
-    				player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
+    				player.sendMessage(ChatColor.GRAY+"In den Channel: "+ChatColor.YELLOW+"Global "+ChatColor.GRAY+"gewechselt.");
     				return true;
     				
     			}
@@ -97,21 +101,25 @@ public class ChatChannelManager extends JavaPlugin {
     				switchTeam = false;
     				switchTrade = false;
     				listener.addRecipient(player);
-    				player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
+    				player.sendMessage(ChatColor.GRAY+"In den Channel: "+ChatColor.WHITE+"Lokal "+ChatColor.GRAY+"gewechselt.");
     				return true;
     				
     			}
     			
     			if(args[0].equalsIgnoreCase("team")){
+    				if(user.has("chatmanager.chat.team", worldName)) {
     				
     				switchGlobal = false;
     				switchLocal = false;
     				switchTeam = true;
     				switchTrade = false;
     				listener.addRecipient(player);
-    				player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
+    				player.sendMessage(ChatColor.GRAY+"In den Channel: "+ChatColor.RED+"Team "+ChatColor.GRAY+"gewechselt.");
     				return true;
     				
+    				}
+    				player.sendMessage(ChatColor.RED+"You do not have the Permission to use this Command.");
+					return false;
     			}
     			
     			if(args[0].equalsIgnoreCase("handel")){
@@ -121,7 +129,7 @@ public class ChatChannelManager extends JavaPlugin {
     				switchTeam = false;
     				switchTrade = true;
     				listener.addRecipient(player);
-    				player.sendMessage("Global: "+switchGlobal+" Lokal: "+switchLocal+" Team: "+switchTeam+" Handel: "+switchTrade);
+    				player.sendMessage(ChatColor.GRAY+"In den Channel: "+ChatColor.AQUA+"Handel "+ChatColor.GRAY+"gewechselt.");
     				return true;
     				
     			}
