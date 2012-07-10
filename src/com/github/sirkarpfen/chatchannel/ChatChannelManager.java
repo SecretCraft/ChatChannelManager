@@ -147,7 +147,8 @@ public class ChatChannelManager extends JavaPlugin {
 
         // Flags
         config.set("enable", pexConfig.getBoolean("permissions.chat.enable", false));
-        config.set("message-format", pexConfig.getString("permissions.chat.format", ChatListener.MESSAGE_FORMAT));
+        config.set("display-name-format", pexConfig.getString("permissions.chat.format", ChatListener.DISPLAY_NAME_FORMAT));
+        config.set("local-message-format", pexConfig.getString("permissions.chat.local-format", ChatListener.LOCAL_MESSAGE_FORMAT));
         config.set("global-message-format", pexConfig.getString("permissions.chat.global-format", ChatListener.GLOBAL_MESSAGE_FORMAT));
         config.set("team-message-format", pexConfig.getString("permissions.chat.team-format", ChatListener.TEAM_MESSAGE_FORMAT));
         config.set("trade-message-format", pexConfig.getString("permissions.chat.trade-format", ChatListener.TRADE_MESSAGE_FORMAT));

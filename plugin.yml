@@ -1,4 +1,4 @@
-name: ChatChannel
+name: ChatChannelManager
 main: com.github.sirkarpfen.chatchannel.ChatChannelManager
 depend: [ PermissionsEx ]
 version: 1.19.1

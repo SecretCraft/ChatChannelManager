@@ -54,22 +54,24 @@ public class ChatListener implements Listener {
 	protected static Pattern chatItalicPattern = Pattern.compile("(?i)&([O])");
 	protected static Pattern chatResetPattern = Pattern.compile("(?i)&([R])");
 	
-	public final static String MESSAGE_FORMAT = "<%prefix%player%suffix> %message";
-	public final static String GLOBAL_MESSAGE_FORMAT = "<%prefix%player%suffix> %message";
-	public final static String TEAM_MESSAGE_FORMAT = "<%prefix%player%suffix> %message";
-	public final static String TRADE_MESSAGE_FORMAT = "<%prefix%player%suffix> %message";
+	public final static String DISPLAY_NAME_FORMAT = "%prefix%player%suffix";
+	public final static String LOCAL_MESSAGE_FORMAT = "&f%message";
+	public final static String GLOBAL_MESSAGE_FORMAT = "&e%message";
+	public final static String TEAM_MESSAGE_FORMAT = "&c%message";
+	public final static String TRADE_MESSAGE_FORMAT = "&b%message";
 	public final static Boolean RANGED_MODE = false;
 	public final static double CHAT_RANGE = 100d;
-	protected String messageFormat = MESSAGE_FORMAT;
+	protected String displayMessageFormat = DISPLAY_NAME_FORMAT;
+	protected String localMessageFormat = LOCAL_MESSAGE_FORMAT;
 	protected String globalMessageFormat = GLOBAL_MESSAGE_FORMAT;
 	protected String teamMessageFormat = TEAM_MESSAGE_FORMAT;
 	protected String tradeMessageFormat = TRADE_MESSAGE_FORMAT;
 	protected boolean rangedMode = RANGED_MODE;
 	protected double chatRange = CHAT_RANGE;
 	protected double range;
-	protected String displayNameFormat = "%prefix%player%suffix";
 	protected String optionChatRange = "chat-range";
-	protected String optionMessageFormat = "message-format";
+	protected String optionDisplayFormat = "display-name-format";
+	protected String optionLocalMessageFormat = "local-message-format";
 	protected String optionGlobalMessageFormat = "global-message-format";
 	protected String optionTeamMessageFormat = "team-message-format";
 	protected String optionTradeMessageFormat = "trade-message-format";
@@ -88,11 +90,13 @@ public class ChatListener implements Listener {
 	private List<Player> playerLocalList = new LinkedList<Player>();
 			
 	public ChatListener(FileConfiguration config) {
-		this.messageFormat = config.getString("message-format", this.messageFormat);
+		this.displayMessageFormat = config.getString("diplay-name-format", this.displayMessageFormat);
+		this.localMessageFormat = config.getString("local-message-format", this.localMessageFormat);
 		this.globalMessageFormat = config.getString("global-message-format", this.globalMessageFormat);
+		this.teamMessageFormat = config.getString("team-message-format", this.teamMessageFormat);
+		this.tradeMessageFormat = config.getString("trade-message-format", this.tradeMessageFormat);
 		this.rangedMode = config.getBoolean("ranged-mode", this.rangedMode);
 		this.chatRange = config.getDouble("chat-range", this.chatRange);
-		this.displayNameFormat = config.getString("display-name-format", this.displayNameFormat);
 	}
 
 	@EventHandler
@@ -109,30 +113,32 @@ public class ChatListener implements Listener {
 		if (user == null) {
 			return;
 		}
-
-		String message = user.getOption(this.optionMessageFormat, worldName, messageFormat);
+		String displayNameFormat = user.getOption(this.optionDisplayFormat, worldName, displayMessageFormat);
+		String message = displayNameFormat + " " + user.getOption(this.optionLocalMessageFormat, worldName, localMessageFormat);
 		boolean localChat = user.getOptionBoolean(this.optionRangedMode, worldName, rangedMode);
 
 		String chatMessage = event.getMessage();
-		if (ChatChannelManager.switchGlobal && user.has("chatmanager.chat.global", worldName)) {
+		if (ChatChannelManager.switchGlobal) {
 			localChat = false;
 			
-			message = user.getOption(this.optionGlobalMessageFormat, worldName, globalMessageFormat);
+			message = displayNameFormat + " " + user.getOption(this.optionGlobalMessageFormat, worldName, globalMessageFormat);
 		}
 		
 		if (ChatChannelManager.switchTeam && user.has("chatmanager.chat.team", worldName)) {
 			localChat = false;
 			
-			message = user.getOption(this.optionTeamMessageFormat, worldName, teamMessageFormat);
+			message = displayNameFormat + " " + user.getOption(this.optionTeamMessageFormat, worldName, teamMessageFormat);
 			
 			event.getRecipients().clear();
 			event.getRecipients().addAll(playerTeamList);
+		} else {
+			player.sendMessage(ChatColor.RED + "You don't have the Permission to do that!");
 		}
 		
-		if (ChatChannelManager.switchTrade && user.has("chatmanager.chat.trade", worldName)) {
+		if (ChatChannelManager.switchTrade) {
 			localChat = false;
 			
-			message = user.getOption(this.optionTradeMessageFormat, worldName, tradeMessageFormat);
+			message = displayNameFormat + " " + user.getOption(this.optionTradeMessageFormat, worldName, tradeMessageFormat);
 			
 			event.getRecipients().clear();
 			event.getRecipients().addAll(playerTradeList);
@@ -170,8 +176,8 @@ public class ChatListener implements Listener {
 			return;
 		}
 
-		String worldName = player.getWorld().getName();
-		player.setDisplayName(this.translateColorCodes(this.replacePlayerPlaceholders(player, user.getOption(this.optionDisplayname, worldName, this.displayNameFormat))));
+		//String worldName = player.getWorld().getName();
+		//player.setDisplayName(this.translateColorCodes(this.replacePlayerPlaceholders(player, user.getOption(this.optionDisplayname, worldName, this.displayNameFormat))));
 	}
 
 	protected String replacePlayerPlaceholders(Player player, String format) {
@@ -224,7 +230,7 @@ public class ChatListener implements Listener {
 	protected void showRecipients(Player player) {
 		ChatColor gray = ChatColor.GRAY;
 		ChatColor red = ChatColor.RED;
-		ChatColor blue = ChatColor.BLUE;
+		ChatColor aqua = ChatColor.AQUA;
 		ChatColor yellow = ChatColor.YELLOW;
 		ChatColor white = ChatColor.WHITE;
 		if(ChatChannelManager.switchGlobal) {
@@ -234,10 +240,10 @@ public class ChatListener implements Listener {
 			player.sendMessage(gray+"Channel: "+red+"Team"+gray+","+white+" "+playerTeamList.size()+" "+gray+"Spieler online");
 		}
 		if(ChatChannelManager.switchTrade) {
-			player.sendMessage(gray+"Channel: "+blue+"Trade"+gray+","+white+" "+playerTradeList.size()+" "+gray+"Spieler online");
+			player.sendMessage(gray+"Channel: "+aqua+"Handel"+gray+","+white+" "+playerTradeList.size()+" "+gray+"Spieler online");
 		}
 		if(ChatChannelManager.switchLocal) {
-			player.sendMessage(gray+"Channel: "+blue+"Lokal"+gray+","+white+" "+getLocalRecipients(player, range).size()+" "+gray+"Spieler im Umkreis");
+			player.sendMessage(gray+"Channel: "+white+"Lokal"+gray+","+white+" "+getLocalRecipients(player, range).size()+" "+gray+"Spieler im Umkreis");
 		}
 	}
 
