@@ -1,5 +1,6 @@
 package com.github.sirkarpfen.chatchannel;
 
+import java.util.Hashtable;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -21,10 +22,7 @@ public class ChatChannelManager extends JavaPlugin {
 
     protected static Logger log;
     protected ChatListener listener;
-    static boolean switchGlobal = false; 
-    static boolean switchLocal = true;
-    static boolean switchTeam = false;
-    static boolean switchTrade = false;
+    private Hashtable<Player,String> playerList = new Hashtable<Player,String>();
 
     @Override
     public void onEnable() {
@@ -45,7 +43,7 @@ public class ChatChannelManager extends JavaPlugin {
             this.initializeConfiguration(config);
         }
 
-        this.listener = new ChatListener(config);
+        this.listener = new ChatListener(config, this);
 
         if (config.getBoolean("enable", false)) {
             this.getServer().getPluginManager().registerEvents(listener, this);
@@ -81,26 +79,22 @@ public class ChatChannelManager extends JavaPlugin {
     				player.sendMessage(ChatColor.GRAY+"Die korrekte Schreibweise ist: "+ChatColor.WHITE+"/channel <Argumente>");
     				return false;
     			}
+    			if(playerList.isEmpty()) {
+    				playerList.put(player, "lokal");
+    			}
+    			if(!(playerList.containsKey(player))) {
+					playerList.put(player, "lokal");
+				}
     			
     			if(args[0].equalsIgnoreCase("global")) {
-    				
-    				switchGlobal = true;
-    				switchLocal = false;
-    				switchTeam = false;
-    				switchTrade = false;
-    				listener.addRecipient(player);
+    				playerList.put(player,"global");
     				player.sendMessage(ChatColor.GRAY+"In den Channel: "+ChatColor.YELLOW+"Global "+ChatColor.GRAY+"gewechselt.");
     				return true;
     				
     			}
     		
     			if(args[0].equalsIgnoreCase("lokal")){
-    				
-    				switchGlobal = false;
-    				switchLocal = true;
-    				switchTeam = false;
-    				switchTrade = false;
-    				listener.addRecipient(player);
+    				playerList.put(player, "lokal");
     				player.sendMessage(ChatColor.GRAY+"In den Channel: "+ChatColor.WHITE+"Lokal "+ChatColor.GRAY+"gewechselt.");
     				return true;
     				
@@ -108,27 +102,16 @@ public class ChatChannelManager extends JavaPlugin {
     			
     			if(args[0].equalsIgnoreCase("team")){
     				if(user.has("chatmanager.chat.team", worldName)) {
-    				
-    				switchGlobal = false;
-    				switchLocal = false;
-    				switchTeam = true;
-    				switchTrade = false;
-    				listener.addRecipient(player);
-    				player.sendMessage(ChatColor.GRAY+"In den Channel: "+ChatColor.RED+"Team "+ChatColor.GRAY+"gewechselt.");
-    				return true;
-    				
+    					playerList.put(player, "team");
+    					player.sendMessage(ChatColor.GRAY+"In den Channel: "+ChatColor.RED+"Team "+ChatColor.GRAY+"gewechselt.");
+    					return true;
     				}
     				player.sendMessage(ChatColor.RED+"You do not have the Permission to use this Command.");
 					return false;
     			}
     			
     			if(args[0].equalsIgnoreCase("handel")){
-    				
-    				switchGlobal = false;
-    				switchLocal = false;
-    				switchTeam = false;
-    				switchTrade = true;
-    				listener.addRecipient(player);
+    				playerList.put(player, "handel");
     				player.sendMessage(ChatColor.GRAY+"In den Channel: "+ChatColor.AQUA+"Handel "+ChatColor.GRAY+"gewechselt.");
     				return true;
     				
@@ -136,7 +119,7 @@ public class ChatChannelManager extends JavaPlugin {
     		
     			if(args[0].equalsIgnoreCase("list")) {
     				
-    				listener.showRecipients(player);
+    				listener.showRecipients(player, playerList);
         			return true;
         			
     			}
@@ -145,6 +128,11 @@ public class ChatChannelManager extends JavaPlugin {
     		}
     	}
 		return false;
+    }
+    
+    protected Hashtable<Player,String> getHashtable() {
+		return playerList;
+    	
     }
 
     protected void initializeConfiguration(FileConfiguration config) {

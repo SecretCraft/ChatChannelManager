@@ -19,6 +19,8 @@
 package com.github.sirkarpfen.chatchannel;
 
 import java.util.Calendar;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -84,12 +86,10 @@ public class ChatListener implements Listener {
 	protected String permissionChatUnderline = "chatmanager.chat.underline";
 	protected String permissionChatItalic = "chatmanager.chat.italic";
 	private MultiverseConnector multiverseConnector;
-	private List<Player> playerGlobalList = new LinkedList<Player>();
-	private List<Player> playerTeamList = new LinkedList<Player>();
-	private List<Player> playerTradeList = new LinkedList<Player>();
-	private List<Player> playerLocalList = new LinkedList<Player>();
+	private List<Player> localPlayers = new LinkedList<Player>();
+	private ChatChannelManager plugin;
 			
-	public ChatListener(FileConfiguration config) {
+	public ChatListener(FileConfiguration config, ChatChannelManager plugin) {
 		this.displayMessageFormat = config.getString("diplay-name-format", this.displayMessageFormat);
 		this.localMessageFormat = config.getString("local-message-format", this.localMessageFormat);
 		this.globalMessageFormat = config.getString("global-message-format", this.globalMessageFormat);
@@ -97,6 +97,7 @@ public class ChatListener implements Listener {
 		this.tradeMessageFormat = config.getString("trade-message-format", this.tradeMessageFormat);
 		this.rangedMode = config.getBoolean("ranged-mode", this.rangedMode);
 		this.chatRange = config.getDouble("chat-range", this.chatRange);
+		this.plugin = plugin;
 	}
 
 	@EventHandler
@@ -118,28 +119,54 @@ public class ChatListener implements Listener {
 		boolean localChat = user.getOptionBoolean(this.optionRangedMode, worldName, rangedMode);
 
 		String chatMessage = event.getMessage();
-		if (ChatChannelManager.switchGlobal) {
+		Hashtable<Player,String> playerList = plugin.getHashtable();
+		
+		if(playerList.isEmpty()) {
+			playerList.put(player, "lokal");
+		}
+		
+		if(!(playerList.containsKey(player))) {
+			playerList.put(player, "lokal");
+		} else {
+			if(playerList.get(player) == null) {
+				playerList.put(player, "lokal");
+			}
+		}
+		
+		String channel = playerList.get(player);
+		
+		if (channel.equals("global")) {
 			localChat = false;
 			
 			message = displayNameFormat + " " + user.getOption(this.optionGlobalMessageFormat, worldName, globalMessageFormat);
 		}
 		
-		if (ChatChannelManager.switchTeam && user.has("chatmanager.chat.team", worldName)) {
+		if (channel.equals("team") && user.has("chatmanager.chat.team", worldName)) {
 			localChat = false;
 			
 			message = displayNameFormat + " " + user.getOption(this.optionTeamMessageFormat, worldName, teamMessageFormat);
 			
 			event.getRecipients().clear();
-			event.getRecipients().addAll(playerTeamList);
+			for(Enumeration<Player> e = playerList.keys(); e.hasMoreElements();) {
+				Player pl = e.nextElement();
+				if(playerList.get(pl).equals("team")) {
+					event.getRecipients().add(pl);
+				}
+			}
 		}
 		
-		if (ChatChannelManager.switchTrade) {
+		if (channel.equals("handel")) {
 			localChat = false;
 			
 			message = displayNameFormat + " " + user.getOption(this.optionTradeMessageFormat, worldName, tradeMessageFormat);
 			
 			event.getRecipients().clear();
-			event.getRecipients().addAll(playerTradeList);
+			for(Enumeration<Player> e = playerList.keys(); e.hasMoreElements();) {
+				Player pl = e.nextElement();
+				if(playerList.get(pl).equals("handel")) {
+					event.getRecipients().add(pl);
+				}
+			}
 		}
 
 		message = this.translateColorCodes(message);
@@ -153,12 +180,12 @@ public class ChatListener implements Listener {
 		event.setFormat(message);
 		event.setMessage(chatMessage);
 
-		if (localChat && ChatChannelManager.switchLocal) {
+		if (localChat && channel.equals("lokal")) {
 			range = user.getOptionDouble(this.optionChatRange, worldName, chatRange);
 
 			event.getRecipients().clear();
-			playerLocalList = this.getLocalRecipients(player, message, range);
-			event.getRecipients().addAll(playerLocalList);
+			localPlayers = this.getLocalRecipients(player, message, range);
+			event.getRecipients().addAll(localPlayers);
 		}
 	}
 
@@ -184,65 +211,43 @@ public class ChatListener implements Listener {
 		return format.replace("%prefix", this.translateColorCodes(user.getPrefix(worldName))).replace("%suffix", this.translateColorCodes(user.getSuffix(worldName))).replace("%world", this.getWorldAlias(worldName)).replace("%player", player.getName());
 	}
 	
-	protected void addRecipient(Player player) {
-		if(ChatChannelManager.switchTrade) {
-			playerTradeList.add(player);
-			if(playerTeamList.contains(player)) {
-				playerTeamList.remove(player);
+	protected void showRecipients(Player player, Hashtable<Player,String> playerList) {
+		String channel = playerList.get(player);
+		int listSize = 0;
+		ChatColor chatColor = ChatColor.WHITE;
+		if(channel.equals("global")) {
+			for(Enumeration<Player> e = playerList.keys(); e.hasMoreElements();) {
+				Player key = e.nextElement();
+				if(playerList.get(key).equals("global")) {
+					listSize += 1;
+				}
 			}
-			if(playerGlobalList.contains(player)) {
-				playerGlobalList.remove(player);
-			}
+			chatColor = ChatColor.YELLOW;
 		}
-		if(ChatChannelManager.switchTeam){
-			playerTeamList.add(player);
-			if(playerTradeList.contains(player)) {
-				playerTradeList.remove(player);
+		if(channel.equals("team")) {
+			for(Enumeration<Player> e = playerList.keys(); e.hasMoreElements();) {
+				Player key = e.nextElement();
+				if(playerList.get(key).equals("team")) {
+					listSize += 1;
+				}
 			}
-			if(playerGlobalList.contains(player)) {
-				playerGlobalList.remove(player);
+			chatColor = ChatColor.RED;
+		}
+		if(channel.equals("handel")) {
+			for(Enumeration<Player> e = playerList.keys(); e.hasMoreElements();) {
+				Player key = e.nextElement();
+				if(playerList.get(key).equals("handel")) {
+					listSize += 1;
+				}
 			}
+			chatColor = ChatColor.AQUA;
 		}
-		if(ChatChannelManager.switchGlobal) {
-			playerGlobalList.add(player);
-			if(playerTradeList.contains(player)) {
-				playerTradeList.remove(player);
-			}
-			if(playerTeamList.contains(player)) {
-				playerTeamList.remove(player);
-			}
+		if(channel.equals("lokal")) {
+			chatColor = ChatColor.WHITE;
+			listSize = this.getLocalRecipients(player, range).size();
 		}
-		if(ChatChannelManager.switchLocal) {
-			if(playerGlobalList.contains(player)) {
-				playerGlobalList.remove(player);
-			}
-			if(playerTradeList.contains(player)) {
-				playerTradeList.remove(player);
-			}
-			if(playerTeamList.contains(player)) {
-				playerTeamList.remove(player);
-			}
-		}
-	}
-	
-	protected void showRecipients(Player player) {
-		ChatColor gray = ChatColor.GRAY;
-		ChatColor red = ChatColor.RED;
-		ChatColor aqua = ChatColor.AQUA;
-		ChatColor yellow = ChatColor.YELLOW;
-		ChatColor white = ChatColor.WHITE;
-		if(ChatChannelManager.switchGlobal) {
-			player.sendMessage(gray+"Channel: "+yellow+"Global"+gray+","+white+" "+playerGlobalList.size()+" "+gray+"Spieler online");
-		}
-		if(ChatChannelManager.switchTeam) {
-			player.sendMessage(gray+"Channel: "+red+"Team"+gray+","+white+" "+playerTeamList.size()+" "+gray+"Spieler online");
-		}
-		if(ChatChannelManager.switchTrade) {
-			player.sendMessage(gray+"Channel: "+aqua+"Handel"+gray+","+white+" "+playerTradeList.size()+" "+gray+"Spieler online");
-		}
-		if(ChatChannelManager.switchLocal) {
-			player.sendMessage(gray+"Channel: "+white+"Lokal"+gray+","+white+" "+getLocalRecipients(player, range).size()+" "+gray+"Spieler im Umkreis");
-		}
+		player.sendMessage(ChatColor.GRAY+"Channel: "+chatColor+"Lokal"+ChatColor.GRAY+","+ChatColor.WHITE+" "+
+						   listSize+" "+ChatColor.GRAY+"Spieler im Channel");
 	}
 
 	protected List<Player> getLocalRecipients(Player sender, String message, double range) {
