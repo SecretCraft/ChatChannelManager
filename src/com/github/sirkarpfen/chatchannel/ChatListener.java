@@ -88,7 +88,8 @@ public class ChatListener implements Listener {
 	private MultiverseConnector multiverseConnector;
 	private List<Player> localPlayers = new LinkedList<Player>();
 	private ChatChannelManager plugin;
-			
+	
+	public ChatListener() {}
 	public ChatListener(FileConfiguration config, ChatChannelManager plugin) {
 		this.displayMessageFormat = config.getString("diplay-name-format", this.displayMessageFormat);
 		this.localMessageFormat = config.getString("local-message-format", this.localMessageFormat);
