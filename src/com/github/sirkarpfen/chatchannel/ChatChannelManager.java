@@ -20,7 +20,7 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
  */
 public class ChatChannelManager extends JavaPlugin {
 
-    protected static Logger log;
+    public static Logger log;
     protected ChatListener listener;
     private Hashtable<Player,String> playerList = new Hashtable<Player,String>();
 
@@ -130,7 +130,7 @@ public class ChatChannelManager extends JavaPlugin {
 		return false;
     }
     
-    protected Hashtable<Player,String> getHashtable() {
+    public Hashtable<Player,String> getHashtable() {
 		return playerList;
     	
     }

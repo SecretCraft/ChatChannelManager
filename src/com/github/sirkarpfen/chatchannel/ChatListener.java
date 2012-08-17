@@ -37,6 +37,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
 
+import com.github.sirkarpfen.chatchannel.ChatChannelManager;
 import com.github.sirkarpfen.chatchannel.utils.MultiverseConnector;
 import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.PermissionUser;
@@ -116,7 +117,7 @@ public class ChatListener implements Listener {
 			return;
 		}
 		String displayNameFormat = user.getOption(this.optionDisplayFormat, worldName, displayMessageFormat);
-		String message = displayNameFormat + " " + user.getOption(this.optionLocalMessageFormat, worldName, localMessageFormat);
+		String message = displayNameFormat + ": " + user.getOption(this.optionLocalMessageFormat, worldName, localMessageFormat);
 		boolean localChat = user.getOptionBoolean(this.optionRangedMode, worldName, rangedMode);
 
 		String chatMessage = event.getMessage();
@@ -139,13 +140,13 @@ public class ChatListener implements Listener {
 		if (channel.equals("global")) {
 			localChat = false;
 			
-			message = displayNameFormat + " " + user.getOption(this.optionGlobalMessageFormat, worldName, globalMessageFormat);
+			message = displayNameFormat + ": " + user.getOption(this.optionGlobalMessageFormat, worldName, globalMessageFormat);
 		}
 		
 		if (channel.equals("team") && user.has("chatmanager.chat.team", worldName)) {
 			localChat = false;
 			
-			message = displayNameFormat + " " + user.getOption(this.optionTeamMessageFormat, worldName, teamMessageFormat);
+			message = displayNameFormat + ": " + user.getOption(this.optionTeamMessageFormat, worldName, teamMessageFormat);
 			
 			event.getRecipients().clear();
 			for(Enumeration<Player> e = playerList.keys(); e.hasMoreElements();) {
@@ -159,7 +160,7 @@ public class ChatListener implements Listener {
 		if (channel.equals("handel")) {
 			localChat = false;
 			
-			message = displayNameFormat + " " + user.getOption(this.optionTradeMessageFormat, worldName, tradeMessageFormat);
+			message = displayNameFormat + ": " + user.getOption(this.optionTradeMessageFormat, worldName, tradeMessageFormat);
 			
 			event.getRecipients().clear();
 			for(Enumeration<Player> e = playerList.keys(); e.hasMoreElements();) {
@@ -329,7 +330,7 @@ public class ChatListener implements Listener {
 		return message;
 	}
 
-	protected String translateColorCodes(String string) {
+	public String translateColorCodes(String string) {
 		if (string == null) {
 			return "";
 		}
@@ -345,7 +346,7 @@ public class ChatListener implements Listener {
 		return newstring;
 	}
 
-	protected String translateColorCodes(String string, PermissionUser user, String worldName) {
+	public String translateColorCodes(String string, PermissionUser user, String worldName) {
 		if (string == null) {
 			return "";
 		}
@@ -388,7 +389,7 @@ public class ChatListener implements Listener {
      * @param world The world to retrieve the string about.
      * @return A colored worldstring if the connector is present, the normal world if it is not.
      */
-    private String getWorldAlias(String world) {
+    public String getWorldAlias(String world) {
         if (this.multiverseConnector != null) {
             return multiverseConnector.getColoredAliasForWorld(world);
         }
